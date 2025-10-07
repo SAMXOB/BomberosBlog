@@ -1,48 +1,29 @@
-
 @extends('layouts.app')
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Lista de Cursos</h1>
+    <h1 class="mb-4">Crear Curso</h1>
 
-    <a href="{{ route('cursos.create') }}" class="btn btn-primary mb-3">Crear Curso</a>
+    <form action="{{ route('cursos.store') }}" method="POST">
+        @csrf
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+        <div class="mb-3">
+            <label for="titulo" class="form-label">Título</label>
+            <input type="text" name="titulo" id="titulo" class="form-control" required>
         </div>
-    @endif
 
-    <table class="table table-striped table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Título</th>
-                <th>Categoría</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($cursos as $curso)
-                <tr>
-                    <td>{{ $curso->titulo }}</td>
-                    <td>{{ $curso->categoria }}</td>
-                    <td>
-                        <a href="{{ route('cursos.edit', $curso->id) }}" class="btn btn-warning btn-sm">Editar</a>
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea name="descripcion" id="descripcion" class="form-control" rows="4" required></textarea>
+        </div>
 
-                        <form action="{{ route('cursos.destroy', $curso->id) }}" method="POST" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este curso?')">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="3" class="text-center">No hay cursos registrados.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        <div class="mb-3">
+            <label for="categoria" class="form-label">Categoría</label>
+            <input type="text" name="categoria" id="categoria" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="{{ route('cursos.index') }}" class="btn btn-secondary">Volver</a>
+    </form>
 </div>
 @endsection
-

@@ -27,7 +27,6 @@
                     <td>{{ $curso->categoria }}</td>
                     <td>
                         <a href="{{ route('cursos.edit', $curso->id) }}" class="btn btn-warning btn-sm">Editar</a>
-
                         <form action="{{ route('cursos.destroy', $curso->id) }}" method="POST" style="display:inline-block;">
                             @csrf
                             @method('DELETE')
