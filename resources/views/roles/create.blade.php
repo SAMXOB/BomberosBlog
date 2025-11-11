@@ -1,29 +1,84 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">Crear Curso</h1>
+    <div class="pagetitle">
+        <h1>Nuevo Rol</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('home.index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('rols.index') }}">Roles</a></li>
+                <li class="breadcrumb-item active">Nuevo Rol</li>
+            </ol>
+        </nav>
+    </div>
 
-    <form action="{{ route('cursos.store') }}" method="POST">
-        @csrf
+    <section class="section dashboard">
+            {{-- Roles --}}
+            <div class="card shadow mt-3">
+                <div class="card-body">
+                    <h3 class="card-title">Nuevo rol</h3>
+                    <form action="{{ route('rols.store')}}" method="POST" id="frmCreate">
+                        @csrf
 
-        <div class="mb-3">
-            <label for="titulo" class="form-label">Título</label>
-            <input type="text" name="titulo" id="titulo" class="form-control" required>
-        </div>
+                        <input type="hidden" name="permissions" id="permissions">
+                        <input type="hidden" name="sections" id="sections">
 
-        <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción</label>
-            <textarea name="descripcion" id="descripcion" class="form-control" rows="4" required></textarea>
-        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input type="text" name="name" placeholder="Nombre..." class="form-control">
+                                <label for="">Nombre</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {{-- Permisos --}}
+            <div class="card shadow mt-3">
+                <div class="card-body">
+                    <h3 class="card-tittle">Permisos</h3>
 
-        <div class="mb-3">
-            <label for="categoria" class="form-label">Categoría</label>
-            <input type="text" name="categoria" id="categoria" class="form-control" required>
-        </div>
+                    <div class="row">
+                        @foreach($modules as $key => $module)
 
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{{ route('cursos.index') }}" class="btn btn-secondary">Volver</a>
-    </form>
-</div>
+                            <div class="col-md-3 mt-3">
+
+                                <h5>{{ $key }}</h5>
+
+                                @foreach($module as $item)
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input permission" data-permission-id="{{ $item->id }}" id="permission_{{ $item->id }}">
+
+                                        <label for="permission_{{ $item->id }}" class="form-check-label">{{ $item->description }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
+                <a href="{{ route('rols.index') }}" class="btn btn-secondary">Volver</a>
+            </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnSave = document.getElementById('btnSave');
+            const form = document.getElementById('frmCreate');
+
+            btnSave.addEventListener('click', function () {
+                const permissions = document.querySelectorAll('.permission:checked');
+
+                const permissionIds = Array.from(permissions).map(p => p.dataset.permissionId);
+
+                document.getElementById('permissions').value = JSON.stringify(permissionIds);
+
+                console.log('Permissions:', permissionIds);
+
+                form.submit(); // <== Ahora enviamos el form con datos bien cargados
+            });
+        });
+    </script>
 @endsection

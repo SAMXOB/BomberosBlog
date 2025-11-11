@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
+        Schema::create('role', function (Blueprint $table) {
+            $table->id(); //Variable ID de tipo entero, autoincremental y Primary Key
+
+            $table->string('roleName');
+            $table->string('roleDescription');
+
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('role');
     }
 };
