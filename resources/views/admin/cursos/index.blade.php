@@ -39,6 +39,9 @@
             <td>{{ $curso->created_at->format('d/m/Y') }}</td>
             <td>
                 <div class="actions">
+                    <a href="{{ route('admin.cursos.modulos.index', $curso) }}" class="btn btn-sm btn-info" title="Gestionar Módulos">
+                        <i class="bi bi-folder2-open"></i> Módulos
+                    </a>
                     @can('edit_cursos')
                     <a href="{{ route('admin.cursos.edit', $curso) }}" class="edit">Editar</a>
                     @endcan

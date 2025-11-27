@@ -15,12 +15,55 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        $users = User::count();
-        $cursos = Curso::count();
-        $roles = Role::count();
-        $permissions = Permission::count();
+        $stats = [
+            'totalUsers' => User::count(),
+            'totalCursos' => Curso::count(),
+            'totalRoles' => Role::count(),
+            'totalPermissions' => Permission::count(),
+            'cursosActivos' => Curso::where('estado', 'activo')->count(),
+            'cursosDraft' => Curso::where('estado', 'draft')->count(),
+            'inscripcionesActivas' => \DB::table('curso_user')
+                ->where('estado', 'activo')
+                ->count(),
+            'cursosCompletados' => \DB::table('curso_user')
+                ->where('estado', 'completado')
+                ->count(),
+        ];
 
-        return view('admin.dashboard', compact('users', 'cursos', 'roles', 'permissions'));
+        // Cursos más populares (más inscritos)
+        $cursosPopulares = Curso::withCount('inscritos')
+            ->orderBy('inscritos_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Cursos recientes
+        $cursosRecientes = Curso::with('user')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        // Inscripciones recientes
+        $inscripcionesRecientes = \DB::table('curso_user')
+            ->join('users', 'curso_user.user_id', '=', 'users.id')
+            ->join('cursos', 'curso_user.curso_id', '=', 'cursos.id')
+            ->select('users.name as user_name', 'cursos.titulo', 'curso_user.inscrito_at')
+            ->orderBy('curso_user.inscrito_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Usuarios más activos
+        $usuariosActivos = User::withCount('cursosInscritos')
+            ->orderBy('cursos_inscritos_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'stats',
+            'cursosPopulares',
+            'cursosRecientes',
+            'inscripcionesRecientes',
+            'usuariosActivos'
+        ));
     }
 
     // ==================== GESTIÓN DE USUARIOS ====================

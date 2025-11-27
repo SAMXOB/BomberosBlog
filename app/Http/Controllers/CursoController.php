@@ -9,8 +9,23 @@ class CursoController extends Controller
 {
     public function index()
     {
-        $cursos = Curso::all();
-        return view('cursos.index', compact('cursos'));
+        $search = request('search');
+        $categoria = request('categoria');
+
+        $query = Curso::with(['user', 'inscritos']);
+
+        if ($search) {
+            $query->buscar($search);
+        }
+
+        if ($categoria) {
+            $query->categoria($categoria);
+        }
+
+        $cursos = $query->paginate(12);
+        $categorias = Curso::distinct()->pluck('categoria');
+
+        return view('cursos.index', compact('cursos', 'categorias'));
     }
 
     public function create()

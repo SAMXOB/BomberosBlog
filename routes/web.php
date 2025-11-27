@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CursoInscripcionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ModuloController;
+use App\Http\Controllers\LeccionController;
 
 // Rutas públicas
 Route::get('/', function () {
@@ -27,6 +31,27 @@ Route::middleware('auth')->group(function () {
     // Dashboard de admin
     Route::get('/admin', [AdminController::class, 'dashboard'])
         ->name('admin.dashboard');
+
+    // Perfil de usuario
+    Route::prefix('perfil')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('show');
+        Route::get('/editar', [ProfileController::class, 'edit'])->name('edit');
+        Route::put('/actualizar', [ProfileController::class, 'update'])->name('update');
+        Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+        Route::get('/estadisticas', [ProfileController::class, 'estadisticas'])->name('estadisticas');
+    });
+
+    // Mis cursos e inscripciones
+    Route::prefix('mis-cursos')->name('cursos.')->group(function () {
+        Route::get('/', [CursoInscripcionController::class, 'misCursos'])->name('mis-cursos');
+        Route::get('/disponibles', [CursoInscripcionController::class, 'index'])->name('disponibles');
+        Route::post('/{curso}/inscribir', [CursoInscripcionController::class, 'inscribir'])->name('inscribir');
+        Route::delete('/{curso}/desinscribir', [CursoInscripcionController::class, 'desinscribir'])->name('desinscribir');
+        Route::put('/{curso}/progreso', [CursoInscripcionController::class, 'actualizarProgreso'])->name('progreso');
+    });
+
+    // Ver detalle de curso
+    Route::get('/cursos/{curso}', [CursoInscripcionController::class, 'show'])->name('cursos.show');
 
     // Gestión de Usuarios
     Route::prefix('admin/usuarios')->name('admin.users.')->group(function () {
@@ -58,6 +83,34 @@ Route::middleware('auth')->group(function () {
             ->name('update');
         Route::delete('/{curso}', [AdminController::class, 'destroyCurso'])
             ->name('destroy');
+
+        // Gestión de Módulos
+        Route::prefix('{curso}/modulos')->name('modulos.')->group(function () {
+            Route::get('/', [ModuloController::class, 'index'])->name('index');
+            Route::get('/crear', [ModuloController::class, 'create'])->name('create');
+            Route::post('/', [ModuloController::class, 'store'])->name('store');
+            Route::get('/{modulo}/editar', [ModuloController::class, 'edit'])->name('edit');
+            Route::put('/{modulo}', [ModuloController::class, 'update'])->name('update');
+            Route::delete('/{modulo}', [ModuloController::class, 'destroy'])->name('destroy');
+            Route::post('/reordenar', [ModuloController::class, 'reorder'])->name('reorder');
+        });
+    });
+
+    // Gestión de Lecciones
+    Route::prefix('admin/modulos/{modulo}/lecciones')->name('admin.modulos.lecciones.')->group(function () {
+        Route::get('/', [LeccionController::class, 'index'])->name('index');
+        Route::get('/crear', [LeccionController::class, 'create'])->name('create');
+        Route::post('/', [LeccionController::class, 'store'])->name('store');
+        Route::get('/{leccion}/editar', [LeccionController::class, 'edit'])->name('edit');
+        Route::put('/{leccion}', [LeccionController::class, 'update'])->name('update');
+        Route::delete('/{leccion}', [LeccionController::class, 'destroy'])->name('destroy');
+    });
+
+    // Visualización y completado de lecciones
+    Route::prefix('lecciones')->name('lecciones.')->group(function () {
+        Route::get('/{leccion}', [LeccionController::class, 'show'])->name('show');
+        Route::post('/{leccion}/completar', [LeccionController::class, 'completar'])->name('completar');
+        Route::delete('/{leccion}/descompletar', [LeccionController::class, 'descompletar'])->name('descompletar');
     });
 
     // Gestión de Roles y Permisos
@@ -77,6 +130,6 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// Rutas de cursos públicas
-Route::resource('cursos', CursoController::class);
+// Rutas públicas de cursos
+Route::get('/cursos', [CursoController::class, 'index'])->name('cursos.index');
 
